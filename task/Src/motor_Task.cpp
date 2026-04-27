@@ -5,6 +5,7 @@
 #include "../Inc/motor_Task.h"
 
 #include "bsp_motor.h"
+#include "debug_vars.h"
 
 void MotorTask::run()
 {
@@ -13,6 +14,7 @@ void MotorTask::run()
     for (;;)
     {
         BSP_Motor_SetSpeed1(300);
+        BSP_Motor_SetSpeed2(300);
         osDelay(5);
     }
 

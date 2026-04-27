@@ -18,7 +18,7 @@ public:
 
     // 启动任务，包装 osThreadCreate
     void start(char* name, uint32_t stackSize, osPriority priority) {
-        osThreadDef_t taskDef;
+
 
         taskDef.name      = name;       // 任务名称
         taskDef.pthread   = taskEntry;  // 静态入口函数
@@ -30,6 +30,7 @@ public:
     }
 
 protected:
+    osThreadDef_t taskDef;
     osThreadId handle_ = nullptr;  // 保存 FreeRTOS 任务句柄
 
 private:

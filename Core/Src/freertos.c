@@ -25,6 +25,8 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+extern void MotorTask_Init();
+void MPU6050ReadTask_Init();
 
 /* USER CODE END Includes */
 
@@ -107,6 +109,8 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  MPU6050ReadTask_Init();
+  MotorTask_Init();
   /* USER CODE END RTOS_THREADS */
 
 }

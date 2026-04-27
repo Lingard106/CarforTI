@@ -21,6 +21,9 @@
 
 #define BAT_VOLTAGE_SCALE   2       // 电池分压比（比如10k+10k分压，比例为2，按你的硬件修改）
 
+/* 输出轴每圈总脉冲，根据编码器安装位置调整 */
+#define GEAR_RATIO              35
+#define OUTPUT_PULSE_PER_ROUND  (PULSE_PER_ROUND * GEAR_RATIO)   // 53900
 /************************* 硬件引脚与定时器映射 *************************/
 // 电机1
 #define M1_PWM_TIM          &htim3
@@ -73,6 +76,18 @@ extern "C" {
     int32_t BSP_Motor_GetPulse1(void);
     void BSP_Motor_Lock(void);    // 进入临界区
     void BSP_Motor_Unlock(void);  // 退出临界区
+
+    // 获取电机输出轴角度（单位：度，范围 [0, 360)）
+    float BSP_Motor_GetAngle1_Deg(void);
+    float BSP_Motor_GetAngle2_Deg(void);
+
+    // 获取累计角度（不限圈数，单位：度）
+    float BSP_Motor_GetTotalAngle1_Deg(void);
+    float BSP_Motor_GetTotalAngle2_Deg(void);
+
+    // 或者返回脉冲数，由上层自行转换
+    int32_t BSP_Motor_GetPulse1(void);
+    int32_t BSP_Motor_GetPulse2(void);
 
 #ifdef __cplusplus
 }

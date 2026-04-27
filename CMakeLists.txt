@@ -48,7 +48,15 @@ add_executable(${CMAKE_PROJECT_NAME}
         Algorithm/Inc/FusionAHRS.h
         Algorithm/Src/FusionAHRS.cpp
         task/Src/motor_Task.cpp
-        task/Inc/motor_Task.h)
+        task/Inc/motor_Task.h
+        task/Inc/MPU6050_read.h
+        task/Src/MPU6050_read.cpp
+        PID/pid.h
+        PID/Src/angle_pid.cpp
+        PID/Src/speed_pid.cpp
+        PID/Inc/angle_pid.h
+        PID/Inc/speed_pid.h
+)
 
 # Add STM32CubeMX generated sources
 add_subdirectory(cmake/stm32cubemx)
@@ -78,6 +86,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
         Debug_Vars
         Algorithm/Inc
         Algorithm/Src
+        PID
+        PID/Inc
+        PID/Src
 )
 
 # Add project symbols (macros)

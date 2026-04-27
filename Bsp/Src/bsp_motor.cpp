@@ -129,6 +129,53 @@ uint16_t BSP_Motor_GetBatteryVoltage(void)
     return (uint16_t)((adc_avg * 3300 / 4095) * BAT_VOLTAGE_SCALE);
 }
 
+
+float BSP_Motor_GetAngle1_Deg(void)
+{
+    int32_t pulse;
+    taskENTER_CRITICAL();
+    pulse = motor1.total_pulse;
+    taskEXIT_CRITICAL();
+    // 将累计脉冲映射到 [0, OUTPUT_PULSE_PER_ROUND) 的范围
+    int32_t remainder = pulse % OUTPUT_PULSE_PER_ROUND;
+    if (remainder < 0) remainder += OUTPUT_PULSE_PER_ROUND;
+    return (remainder * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+}
+
+/**
+ * @brief  获取电机1累计角度（度，不带圈数限制）
+ */
+float BSP_Motor_GetTotalAngle1_Deg(void)
+{
+    int32_t pulse;
+    taskENTER_CRITICAL();
+    pulse = motor1.total_pulse;
+    taskEXIT_CRITICAL();
+    return (pulse * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+}
+
+// 电机2的函数同理，替换脉冲源即可
+float BSP_Motor_GetAngle2_Deg(void)
+{
+    int32_t pulse;
+    taskENTER_CRITICAL();
+    pulse = motor2.total_pulse;
+    taskEXIT_CRITICAL();
+    // 将累计脉冲映射到 [0, OUTPUT_PULSE_PER_ROUND) 的范围
+    int32_t remainder = pulse % OUTPUT_PULSE_PER_ROUND;
+    if (remainder < 0) remainder += OUTPUT_PULSE_PER_ROUND;
+    return (remainder * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+}
+
+float BSP_Motor_GetTotalAngle2_Deg(void)
+{
+    int32_t pulse;
+    taskENTER_CRITICAL();
+    pulse = motor2.total_pulse;
+    taskEXIT_CRITICAL();
+    return (pulse * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+}
+
 static void Encoder_Update(void)
 {
     uint32_t dwt_start_cycle = DWT_GetCycleCount();
