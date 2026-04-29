@@ -9,8 +9,10 @@
 volatile float debug_roll;
 volatile float debug_pitch;
 volatile float debug_yaw;
-volatile float debug_tube1;
-volatile float debug_tube2;
-volatile float debug_tube3;
-volatile float debug_tube4;
-volatile float debug_tube5;
+// volatile float debug_tube1;
+// volatile float debug_tube2;
+// volatile float debug_tube3;
+// volatile float debug_tube4;
+// volatile float debug_tube5;
+volatile float g_balance_pitch = 0.0f;    // 度
+volatile float g_balance_gyro_y = 0.0f;   // 度/秒

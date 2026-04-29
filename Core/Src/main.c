@@ -30,6 +30,7 @@
 #include "bsp_motor.h"
 #include "bsp_dwt.h"
 #include "MPU6050.h"
+//#include "speed_pid.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -102,8 +103,9 @@ int main(void)
   MX_I2C1_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
- BSP_DWT_Init();
+  BSP_DWT_Init();
   BSP_Motor_Init();
+  //speed_pid_clear();
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in cmsis_os2.c) */
@@ -119,9 +121,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    BSP_Motor_SetSpeed1(300);
-    //BSP_Motor_SetSpeed2(300);
-    HAL_Delay(10);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -139,7 +139,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  //__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.

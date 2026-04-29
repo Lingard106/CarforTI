@@ -56,6 +56,11 @@ add_executable(${CMAKE_PROJECT_NAME}
         PID/Src/speed_pid.cpp
         PID/Inc/angle_pid.h
         PID/Inc/speed_pid.h
+        task/Src/Balance_Task.cpp
+        task/Inc/Balance_Task.h
+        Algorithm/Src/MahonyAHRS.c
+        task/Src/Car_Task.cpp
+        task/Inc/Car_Task.h
 )
 
 # Add STM32CubeMX generated sources

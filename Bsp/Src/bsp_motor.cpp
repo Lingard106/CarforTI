@@ -6,7 +6,6 @@
 #include "stm32f4xx_hal.h"
 #include "tim.h"
 #include "adc.h"
-#include "gpio.h"
 #include "bsp_dwt.h"
 
 // FreeRTOS 头文件（目前只用到 taskENTER_CRITICAL）
@@ -14,8 +13,8 @@
 #include "task.h"
 
 /************************* 全局变量 *************************/
-Motor_State_t motor1 = {0, 0, 0, false};   // 按顺序初始化：total_pulse, speed_rpm, last_pulse, inited
-Motor_State_t motor2 = {0, 0, 0, false};
+Motor_State_t motor1 = {0, 0, 0, false,0,0};   // 按顺序初始化：total_pulse, speed_rpm, last_pulse, inited
+Motor_State_t motor2 = {0, 0, 0, false,0,0};
 
 volatile uint32_t g_enc_update_cycles = 0;
 volatile uint32_t g_enc_update_us = 0;
@@ -43,19 +42,23 @@ void BSP_Motor_Init(void)
     HAL_TIM_Encoder_Start(M1_ENC_TIM, TIM_CHANNEL_ALL);
     HAL_TIM_Encoder_Start(M2_ENC_TIM, TIM_CHANNEL_ALL);
 
-    // 4. 状态初始化（直接赋值）
+    // 4. 状态初始化
     motor1.total_pulse = 0;
     motor1.speed_rpm = 0;
     motor1.last_pulse = (int32_t)__HAL_TIM_GET_COUNTER(M1_ENC_TIM);
+    motor1.angle_deg = 0.0f;        // 【新增】初始化角度
+    motor1.total_angle_deg = 0.0f;  // 【新增】初始化角度
     motor1.inited = true;
 
     motor2.total_pulse = 0;
     motor2.speed_rpm = 0;
     motor2.last_pulse = (int32_t)__HAL_TIM_GET_COUNTER(M2_ENC_TIM);
+    motor2.angle_deg = 0.0f;        // 【新增】初始化角度
+    motor2.total_angle_deg = 0.0f;  // 【新增】初始化角度
     motor2.inited = true;
 
-    // 5. 启动 TIM6 硬件定时器（取代 FreeRTOS 软件定时器）
-    HAL_TIM_Base_Start_IT(&htim6);   // CubeMX 生成的 htim6 句柄
+    // 5. 启动 TIM6 硬件定时器
+    HAL_TIM_Base_Start_IT(&htim6);
 }
 
 void BSP_Motor_SetSpeed1(int16_t speed)
@@ -63,14 +66,14 @@ void BSP_Motor_SetSpeed1(int16_t speed)
     if (speed > PWM_MAX_SPEED) speed = PWM_MAX_SPEED;
     if (speed < -PWM_MAX_SPEED) speed = -PWM_MAX_SPEED;
 
-    HAL_GPIO_WritePin(M1_IN1_PORT, M1_IN1_PIN, GPIO_PIN_RESET);
-    HAL_GPIO_WritePin(M1_IN2_PORT, M1_IN2_PIN, GPIO_PIN_RESET);
-    DWT_Delay_us(2);
 
+   // DWT_Delay_us(2);
     if (speed >= 0) {
         HAL_GPIO_WritePin(M1_IN1_PORT, M1_IN1_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(M1_IN2_PORT, M1_IN2_PIN, GPIO_PIN_RESET);
     } else {
         HAL_GPIO_WritePin(M1_IN2_PORT, M1_IN2_PIN, GPIO_PIN_SET);
+        HAL_GPIO_WritePin(M1_IN1_PORT, M1_IN1_PIN, GPIO_PIN_RESET);
     }
 
     uint16_t abs_speed = (speed < 0) ? -speed : speed;
@@ -84,11 +87,11 @@ void BSP_Motor_SetSpeed2(int16_t speed)
     if (speed < -PWM_MAX_SPEED) speed = -PWM_MAX_SPEED;
 
     if (speed >= 0) {
+       HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_SET);
+    } else {
         HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_SET);
         HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_RESET);
-    } else {
-        HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_SET);
     }
 
     uint16_t abs_speed = (speed < 0) ? -speed : speed;
@@ -115,7 +118,14 @@ int32_t BSP_Motor_GetPulse1(void)
 {
     return motor1.total_pulse;
 }
-
+int16_t BSP_Motor_GetSpeed2(void)
+{
+    return motor2.speed_rpm;
+}
+int32_t BSP_Motor_GetPulse2(void)
+{
+    return motor2.total_pulse;
+}
 uint16_t BSP_Motor_GetBatteryVoltage(void)
 {
     uint32_t adc_sum = 0;
@@ -132,49 +142,52 @@ uint16_t BSP_Motor_GetBatteryVoltage(void)
 
 float BSP_Motor_GetAngle1_Deg(void)
 {
-    int32_t pulse;
+    float angle;
     taskENTER_CRITICAL();
-    pulse = motor1.total_pulse;
+    angle = motor1.angle_deg; // 直接读结构体
     taskEXIT_CRITICAL();
-    // 将累计脉冲映射到 [0, OUTPUT_PULSE_PER_ROUND) 的范围
-    int32_t remainder = pulse % OUTPUT_PULSE_PER_ROUND;
-    if (remainder < 0) remainder += OUTPUT_PULSE_PER_ROUND;
-    return (remainder * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+    return angle;
 }
 
-/**
- * @brief  获取电机1累计角度（度，不带圈数限制）
- */
 float BSP_Motor_GetTotalAngle1_Deg(void)
 {
-    int32_t pulse;
+    float angle;
     taskENTER_CRITICAL();
-    pulse = motor1.total_pulse;
+    angle = motor1.total_angle_deg; // 直接读结构体
     taskEXIT_CRITICAL();
-    return (pulse * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+    return angle;
 }
 
-// 电机2的函数同理，替换脉冲源即可
 float BSP_Motor_GetAngle2_Deg(void)
 {
-    int32_t pulse;
+    float angle;
     taskENTER_CRITICAL();
-    pulse = motor2.total_pulse;
+    angle = motor2.angle_deg;
     taskEXIT_CRITICAL();
-    // 将累计脉冲映射到 [0, OUTPUT_PULSE_PER_ROUND) 的范围
-    int32_t remainder = pulse % OUTPUT_PULSE_PER_ROUND;
-    if (remainder < 0) remainder += OUTPUT_PULSE_PER_ROUND;
-    return (remainder * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+    return angle;
 }
 
 float BSP_Motor_GetTotalAngle2_Deg(void)
 {
-    int32_t pulse;
+    float angle;
     taskENTER_CRITICAL();
-    pulse = motor2.total_pulse;
+    angle = motor2.total_angle_deg;
     taskEXIT_CRITICAL();
-    return (pulse * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+    return angle;
 }
+
+// 【新增】辅助函数：封装角度计算逻辑
+static void Update_Motor_Angle(Motor_State_t *motor)
+{
+    // 1. 计算累计总角度
+    motor->total_angle_deg = (motor->total_pulse * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+
+    // 2. 计算单圈角度 [0, 360)
+    int32_t remainder = motor->total_pulse % OUTPUT_PULSE_PER_ROUND;
+    if (remainder < 0) remainder += OUTPUT_PULSE_PER_ROUND;
+    motor->angle_deg = (remainder * 360.0f) / OUTPUT_PULSE_PER_ROUND;
+}
+
 
 static void Encoder_Update(void)
 {
@@ -198,6 +211,9 @@ static void Encoder_Update(void)
     motor2.last_pulse = cur_pulse2;
     motor1.speed_rpm = (int16_t)(diff1 * RPM_FACTOR);
     motor2.speed_rpm = (int16_t)(diff2 * RPM_FACTOR);
+
+    Update_Motor_Angle(&motor1);
+    Update_Motor_Angle(&motor2);
 
     uint32_t dwt_end_cycle = DWT_GetCycleCount();
     uint64_t dwt_end_us = DWT_GetMicroseconds();

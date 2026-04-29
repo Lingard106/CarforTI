@@ -16,7 +16,7 @@ class MPU6050ReadTask : public TaskBase
     public: void run() override;
 private:
     FusionAHRS ahrs_{1000.0f};  // 采样频率 1000Hz，需与实际调用频率一致
-     float euler_[3]; // 存储欧拉角 roll, pitch, yaw (单位：度)
+     float euler_[3]={0,0,0}; // 存储欧拉角 roll, pitch, yaw (单位：度)
 
 };
 #endif

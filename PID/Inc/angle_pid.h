@@ -18,9 +18,9 @@ public:
 
     int16_t calculate( float feedback, float dt);
 
-    private:
-    int16_t target_angle = 0;
-    int32_t handleZeroCross(int32_t taget,int32_t feedback);
+    // private:
+     int16_t target_angle = 0;
+    // int32_t handleZeroCross(int32_t taget,int32_t feedback);
 };
 
 
@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
     void angle_pid_clear();
-    int16_t  angle_pid_calculate(float setpoint, float feedback, float dt);
+    float  angle_pid_calculate(float setpoint, float feedback, float dt);
 
 #ifdef __cplusplus
 }

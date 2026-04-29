@@ -98,7 +98,8 @@ uint8_t MPU6050::sensorInit() {
     if (status != HAL_OK) return MPU6050_PWR_ERROR;
 
     // 5. 配置采样率分频（1kHz）
-    status = writeReg(MPU6050_SMPLRT_DIV, MPU6050_SMPLRT_1000HZ);
+    //status = writeReg(MPU6050_SMPLRT_DIV, MPU6050_SMPLRT_1000HZ);
+    status = writeReg(MPU6050_SMPLRT_DIV, MPU6050_SMPLRT_500HZ);   // 500Hz
     if (status != HAL_OK) return MPU6050_SMPLRT_ERROR;
 
     // 6. 配置数字低通滤波器（20Hz）

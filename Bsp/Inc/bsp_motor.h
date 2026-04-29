@@ -20,10 +20,13 @@
 #define PWM_MAX_SPEED       1000    // 速度输入范围-1000~1000
 
 #define BAT_VOLTAGE_SCALE   2       // 电池分压比（比如10k+10k分压，比例为2，按你的硬件修改）
+/* 【核心修复】输出轴每圈总脉冲 */
+// 方案 A：如果编码器装在【轮子/输出轴】上（根据你的现象，选这个）：
+#define OUTPUT_PULSE_PER_ROUND  (PULSE_PER_ROUND)   // 不再乘以 GEAR_RATIO
 
-/* 输出轴每圈总脉冲，根据编码器安装位置调整 */
-#define GEAR_RATIO              35
-#define OUTPUT_PULSE_PER_ROUND  (PULSE_PER_ROUND * GEAR_RATIO)   // 53900
+// 方案 B：如果确认编码器装在【电机轴】上，才用下面这个：
+// #define GEAR_RATIO              35
+// #define OUTPUT_PULSE_PER_ROUND  (PULSE_PER_ROUND * GEAR_RATIO)
 /************************* 硬件引脚与定时器映射 *************************/
 // 电机1
 #define M1_PWM_TIM          &htim3
@@ -52,10 +55,12 @@
 
 /************************* 电机状态结构体 *************************/
 typedef struct {
-    volatile int32_t total_pulse;
-    volatile int16_t speed_rpm;
+    int32_t total_pulse;
+    int16_t speed_rpm;
     int32_t last_pulse;
     bool inited;
+    float angle_deg;           // 【新增】当前单圈角度 [0, 360)
+    float total_angle_deg;     // 【新增】累计总角度（带圈数）
 } Motor_State_t;
 
 /************************* 关键修复：extern "C" 包裹函数声明 *************************/
@@ -74,6 +79,8 @@ extern "C" {
     // 线程安全的读取接口（任务中调用时可用临界区保护复合读取）
     int16_t BSP_Motor_GetSpeed1(void);
     int32_t BSP_Motor_GetPulse1(void);
+    int16_t BSP_Motor_GetSpeed2(void);
+    int32_t BSP_Motor_GetPulse2(void);
     void BSP_Motor_Lock(void);    // 进入临界区
     void BSP_Motor_Unlock(void);  // 退出临界区
 
@@ -88,6 +95,7 @@ extern "C" {
     // 或者返回脉冲数，由上层自行转换
     int32_t BSP_Motor_GetPulse1(void);
     int32_t BSP_Motor_GetPulse2(void);
+    //static void Update_Motor_Angle(Motor_State_t *motor);
 
 #ifdef __cplusplus
 }

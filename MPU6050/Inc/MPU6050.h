@@ -21,6 +21,7 @@
 #define MPU6050_WAKE_VALUE       0x01    // 时钟源=陀螺仪X轴，唤醒
 #define MPU6050_RESET_VALUE      0x80    // 设备复位
 #define MPU6050_SMPLRT_1000HZ    0x00    // 1kHz 采样率（SMPLRT_DIV=0）
+#define MPU6050_SMPLRT_500HZ     0x01    // 500Hz 采样率 (SMPLRT_DIV=1)
 #define MPU6050_FILTER_20HZ      0x04    // DLPF_CFG=4，20Hz带宽
 #define MPU6050_GYRO_250DPS      0x00    // ±250°/s
 #define MPU6050_ACCEL_2G         0x00    // ±2g

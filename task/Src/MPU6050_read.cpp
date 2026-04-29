@@ -35,6 +35,7 @@ static void quat2Euler(const float q[4], float euler[3])
     euler[2] *= rad2deg;
 }
 
+
 void MPU6050ReadTask::run()
 {
     MPU6050_Init();
@@ -43,7 +44,7 @@ void MPU6050ReadTask::run()
     float temp;
     float gyro[3], accel[3];
     float q[4];           // 四元数
-
+    uint32_t prevWakeTime = osKernelSysTick();
 
 
 
@@ -79,7 +80,11 @@ void MPU6050ReadTask::run()
         debug_pitch = euler_[1];   // pitch
         debug_yaw = euler_[2];   // yaw
 
-        osDelay(1);
+        g_balance_pitch = euler_[1];
+        g_balance_gyro_y = gyro[1];
+
+        //osDelay(2);
+        osDelayUntil(&prevWakeTime, 2);   // 2ms = 500Hz
     }
 
 }
