@@ -104,7 +104,7 @@
 
 ### 环境依赖
 
-- 开发工具：STM32CubeMX + Keil MDK5  
+- 开发工具：STM32CubeMX + Clion  
 - 固件库：STM32F4xx HAL 库  
 - 操作系统：FreeRTOS（兼容 DWT 硬件计时）  
 - 硬件烧录：ST-Link
