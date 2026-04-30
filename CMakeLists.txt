@@ -61,6 +61,10 @@ add_executable(${CMAKE_PROJECT_NAME}
         Algorithm/Src/MahonyAHRS.c
         task/Src/Car_Task.cpp
         task/Inc/Car_Task.h
+        Modules/Inc/tcrt.h
+        Modules/Src/tcrt.cpp
+        task/Src/Track_Task.cpp
+        task/Inc/Track_Task.h
 )
 
 # Add STM32CubeMX generated sources
@@ -94,6 +98,9 @@ target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
         PID
         PID/Inc
         PID/Src
+        Modules
+        Modules/Inc
+        Modules/Src
 )
 
 # Add project symbols (macros)

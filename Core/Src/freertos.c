@@ -28,6 +28,7 @@
 extern void MotorTask_Init();
 extern void MPU6050ReadTask_Init();
 extern void BalanceTask_Init();
+extern void CarTask_Init();
 
 /* USER CODE END Includes */
 
@@ -113,6 +114,7 @@ void MX_FREERTOS_Init(void) {
   MPU6050ReadTask_Init();
   //MotorTask_Init();
   BalanceTask_Init();
+  CarTask_Init();
   /* USER CODE END RTOS_THREADS */
 
 }

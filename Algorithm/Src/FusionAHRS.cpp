@@ -8,7 +8,7 @@
 
 #define GRAVITY 9.81f
 #define GYRO_STATIC_THRESH 0.02f
-#define ACC_STATIC_THRESH  0.2f
+#define ACC_STATIC_THRESH  0.05f
 
 /* ===========================
    GyroBiasEKF

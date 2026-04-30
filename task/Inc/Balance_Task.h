@@ -7,6 +7,11 @@
 #pragma once
 #include "TaskBase.h"
 
+typedef struct {
+    float target_speed;
+    float target_angle;
+    int16_t motor_pwm_out;
+} BalanceControl_t;
 
 #ifdef __cplusplus
 class BalanceTask : public TaskBase

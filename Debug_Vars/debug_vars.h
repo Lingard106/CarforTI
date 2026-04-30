@@ -11,11 +11,11 @@
 extern volatile float debug_roll;
 extern volatile float debug_pitch;
 extern volatile float debug_yaw;
-// extern volatile float debug_tube1;
-// extern volatile float debug_tube2;
-// extern volatile float debug_tube3;
-// extern volatile float debug_tube4;
-// extern volatile float debug_tube5;
+extern volatile float debug_tube1;
+extern volatile float debug_tube2;
+extern volatile float debug_tube3;
+extern volatile float debug_tube4;
+extern volatile float debug_tube5;
 extern volatile float g_balance_pitch ;    // 度
 extern volatile float g_balance_gyro_y;   // 度/秒
 #endif //TWOWHEELBALCANCE_DEBUG_VARS_H

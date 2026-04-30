@@ -87,11 +87,11 @@ void BSP_Motor_SetSpeed2(int16_t speed)
     if (speed < -PWM_MAX_SPEED) speed = -PWM_MAX_SPEED;
 
     if (speed >= 0) {
-       HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_RESET);
-        HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_SET);
-    } else {
-        HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_SET);
+       HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_SET);
         HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_RESET);
+    } else {
+        HAL_GPIO_WritePin(M2_IN1_PORT, M2_IN1_PIN, GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(M2_IN2_PORT, M2_IN2_PIN, GPIO_PIN_SET);
     }
 
     uint16_t abs_speed = (speed < 0) ? -speed : speed;
